@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=80.8.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aiogram-dialog-survey"
+version = "0.1.0"
+authors = [
+    {name = "Pavel Danilevich", email = "danilevitch.pasha@yandex.ru"},
+]
+description = "Quick and easy creation of surveys, questionnaires, and forms using aiogram-dialog"
+readme = "README.md"
+license = {text = "Apache 2.0"}
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+
+
+
+dependencies = [
+    "aiogram>=3.14.0",
+    "aiogram-dialog>=2.3.1",
+]
+
+[tool.poetry.group.dev.dependencies]
+build = "^1.2.2.post1"
+
+[project.urls]
+"Homepage" = "https://github.com/pasha-danilevich/aiogram_dialog_survey"
+"Bug Tracker" = "https://github.com/pasha-danilevich/aiogram_dialog_survey/issues"
