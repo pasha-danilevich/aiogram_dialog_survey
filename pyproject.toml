@@ -1,17 +1,13 @@
-[build-system]
-requires = ["setuptools>=80.8.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "aiogram-dialog-survey"
 version = "0.1.0"
-authors = [
-    {name = "Pavel Danilevich", email = "danilevitch.pasha@yandex.ru"},
-]
 description = "Quick and easy creation of surveys, questionnaires, and forms using aiogram-dialog"
-readme = "README.md"
-license = {text = "Apache 2.0"}
-requires-python = ">=3.9"
+authors = ["Pavel Danilevich <danilevitch.pasha@yandex.ru>"]
+
+readme = "README.md"                 # Указываем файл с описанием проекта
+license = "Apache-2.0"              # Лицензия в формате SPDX (Apache 2.0)
+
+# Классификаторы PyPI для улучшения поиска и категоризации пакета
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
@@ -24,16 +20,30 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[tool.poetry.dependencies]
+python = ">=3.9"
+aiogram = ">=3.14.0"
+aiogram-dialog = ">=2.3.1"
 
-
-dependencies = [
-    "aiogram>=3.14.0",
-    "aiogram-dialog>=2.3.1",
-]
-
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.dev-dependencies]
 build = "^1.2.2.post1"
 
-[project.urls]
-"Homepage" = "https://github.com/pasha-danilevich/aiogram_dialog_survey"
-"Bug Tracker" = "https://github.com/pasha-danilevich/aiogram_dialog_survey/issues"
+[tool.poetry.urls]
+homepage = "https://github.com/pasha-danilevich/aiogram_dialog_survey"
+bug-tracker = "https://github.com/pasha-danilevich/aiogram_dialog_survey/issues"
+
+
+# -------------
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+
+
+
+
+
+

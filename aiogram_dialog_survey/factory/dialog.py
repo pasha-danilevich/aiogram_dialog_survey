@@ -12,11 +12,10 @@ from aiogram_dialog.widgets.kbd import (
 )
 from aiogram_dialog.widgets.text import Const, Format
 
-from db.tables.questionnaire import QuestionType
 from aiogram_dialog_survey import widgets
 from aiogram_dialog_survey.factory.state import StateGroupFactory
 from aiogram_dialog_survey.handler import WindowHandler
-from aiogram_dialog_survey.interface import ActionType, IWindowHandler, QuestionDict
+from aiogram_dialog_survey.interface import ActionType, IWindowHandler, QuestionDict, QuestionType
 
 
 class WrapperWindows:
@@ -54,14 +53,13 @@ class QuestionnaireFactory(StateGroupFactory, WrapperWindows):
     # TODO: Нужно предусмотреть возможность суб анкет. То есть может появиться ветвление, которое ведет в суб анкету
     def __init__(
         self,
-        questionnaire_name: str,
+        survey_name: str,
         questions: list[QuestionDict],
         handler: Type[IWindowHandler] = WindowHandler,
     ):
         self._handler = handler
         self.questions = questions
-        self.questionnaire_name = questionnaire_name
-        self.state_group_name = questionnaire_name.title()
+        self.state_group_name = survey_name.title()
         self._state_group = self.create_state_group(
             self.state_group_name,
             [question["name"] for question in questions],
