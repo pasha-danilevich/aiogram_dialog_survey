@@ -9,15 +9,16 @@ from aiogram_dialog.widgets.kbd import Multiselect as AiogramDialogMultiselect
 from aiogram_dialog.widgets.kbd import Select as AiogramDialogSelect
 from aiogram_dialog.widgets.text import Format, Const
 
-from aiogram_dialog_survey.interface import QuestionDict, IWindowHandler, ActionType, Button
+from aiogram_dialog_survey.interface import QuestionDict, IWindowHandler, ActionType
 
 WidgetButton = Tuple[str, Union[str, int]]
+
 
 class Widget(ABC):
 	@abstractmethod
 	def __init__(self, question: QuestionDict, handler: IWindowHandler):
 		pass
-	
+
 	@abstractmethod
 	def create(self):
 		pass
@@ -27,14 +28,14 @@ class BaseWidget(Widget):
 	def __init__(self, question: QuestionDict, handler: IWindowHandler):
 		self.question = question
 		self.handler = handler
-	
+
 	def create(self):
 		raise NotImplementedError
-	
+
 	@property
 	def item_id_getter(self):
 		return lambda x: x[1]
-	
+
 	def create_items(self) -> list[WidgetButton]:
 		return [(x['text'], x['id']) for x in self.question["options"]]
 
@@ -65,7 +66,7 @@ class Select(BaseWidget):
 
 class Multiselect(BaseWidget):
 	ACCEPT_BUTTON_TEXT = "Подтвердить выбор"
-	
+
 	def create(self):
 		return Column(
 			AiogramDialogMultiselect(
@@ -81,6 +82,6 @@ class Multiselect(BaseWidget):
 				id='__accept__',
 				on_click=self.handler.get_handler(ActionType.ON_ACCEPT),
 				when=F["dialog_data"][self.handler.get_widget_key()].len()
-				     > 0,  # Only show when items are selected
+					 > 0,  # Only show when items are selected
 			),
 		)

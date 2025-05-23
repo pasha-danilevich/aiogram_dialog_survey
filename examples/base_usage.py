@@ -15,7 +15,7 @@ from aiogram_dialog.widgets.kbd import Button, Start
 from aiogram_dialog.widgets.text import Const
 
 from aiogram_dialog_survey.factory.dialog import QuestionnaireFactory
-from aiogram_dialog_survey.interface import QuestionDict, QuestionType
+from aiogram_dialog_survey.interface import QuestionDict, QuestionType, ButtonDict
 
 API_TOKEN = "7886751328:AAGMynt9zQhWqrgbe0gaNq3d-MaYZZ8IexQ"
 
@@ -27,7 +27,6 @@ class MainSG(StatesGroup):
 # Опросник из 4 вопросов на тему IT
 survey: list[QuestionDict] = [
     {
-        "id": 1,
         "name": "favorite_language",
         "question_type": QuestionType.SELECT,
         "text": "Какой ваш любимый язык программирования?",
@@ -40,7 +39,6 @@ survey: list[QuestionDict] = [
         ],
     },
     {
-        "id": 2,
         "name": "years_experience",
         "question_type": QuestionType.TEXT,
         "text": "Сколько лет вы занимаетесь программированием?",
@@ -48,7 +46,6 @@ survey: list[QuestionDict] = [
         "options": None,
     },
     {
-        "id": 3,
         "name": "preferred_tools",
         "question_type": QuestionType.MULTISELECT,
         "text": "Какие инструменты разработки вы используете?",
@@ -62,7 +59,6 @@ survey: list[QuestionDict] = [
         ],
     },
     {
-        "id": 4,
         "name": "interested_topics",
         "question_type": QuestionType.MULTISELECT,
         "text": "Какие темы в IT вам наиболее интересны?",
@@ -80,7 +76,6 @@ survey: list[QuestionDict] = [
 factory = QuestionnaireFactory(survey_name='some', questions=survey)
 start_state = factory.get_first_state()
 questionnaire_dialog = factory.to_dialog()
-
 
 main_menu = Dialog(
     Window(
