@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Union, Tuple
+from typing import Union, Tuple, Type
 
 from aiogram import F
 from aiogram_dialog.widgets.input import TextInput
@@ -9,7 +9,7 @@ from aiogram_dialog.widgets.kbd import Multiselect as AiogramDialogMultiselect
 from aiogram_dialog.widgets.kbd import Select as AiogramDialogSelect
 from aiogram_dialog.widgets.text import Format, Const
 
-from aiogram_dialog_survey.interface import QuestionDict, IWindowHandler, ActionType
+from aiogram_dialog_survey.interface import QuestionDict, IWindowHandler, ActionType, QuestionType
 
 WidgetButton = Tuple[str, Union[str, int]]
 
@@ -85,3 +85,27 @@ class Multiselect(BaseWidget):
 					 > 0,  # Only show when items are selected
 			),
 		)
+
+
+class WidgetManager:
+	@staticmethod
+	def get_widget(question_type: QuestionType) -> Type[Widget]:
+		match question_type:
+			case QuestionType.MULTISELECT:
+				return Multiselect
+			case QuestionType.SELECT:
+				return Select
+			case QuestionType.TEXT:
+				return Text
+
+		raise ValueError("Unknown question type")
+
+	@staticmethod
+	def get_skip_button(question: QuestionDict, handler: IWindowHandler) -> AiogramDialogButton | Const:
+		if not question["is_required"]:
+			return AiogramDialogButton(
+				Const("Пропустить вопрос"),
+				id=f'skip_{question["name"]}',
+				on_click=handler.get_handler(ActionType.ON_SKIP),
+			)
+		return Const('')  # пустая кнопка

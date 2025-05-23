@@ -14,7 +14,7 @@ from aiogram_dialog import (
 from aiogram_dialog.widgets.kbd import Button, Start
 from aiogram_dialog.widgets.text import Const
 
-from aiogram_dialog_survey.factory.dialog import QuestionnaireFactory
+from aiogram_dialog_survey import SurveyFactory
 from aiogram_dialog_survey.interface import QuestionDict, QuestionType, ButtonDict
 
 API_TOKEN = "7886751328:AAGMynt9zQhWqrgbe0gaNq3d-MaYZZ8IexQ"
@@ -73,7 +73,7 @@ survey: list[QuestionDict] = [
     },
 ]
 
-factory = QuestionnaireFactory(survey_name='some', questions=survey)
+factory = SurveyFactory(name='some', questions=survey)
 start_state = factory.get_first_state()
 questionnaire_dialog = factory.to_dialog()
 
