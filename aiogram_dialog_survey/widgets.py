@@ -120,7 +120,7 @@ class WidgetManager:
                 id=f'skip_{question["name"]}',
                 on_click=handler.get_handler(ActionType.ON_SKIP),
             )
-        return Const('')  # пустая кнопка
+        return AiogramDialogButton(Const(''), id='empty')  # пустая кнопка
 
     @staticmethod
     def get_start_button(text: str, state: State) -> AiogramDialogStart:

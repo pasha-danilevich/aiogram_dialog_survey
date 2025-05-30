@@ -21,7 +21,6 @@ class Handlers:
         key = handler.get_widget_key()
         manager.dialog_data[key] = item_id
 
-
         await handler.process_handler(manager, key, ActionType.ON_SELECT)
         await handler.end_handler(manager)
 
@@ -34,7 +33,6 @@ class Handlers:
     ):
         key = handler.get_widget_key()
         manager.dialog_data[key] = handler.SKIP_CONST
-
 
         await handler.process_handler(manager, key, ActionType.ON_SKIP)
         await handler.end_handler(manager)
@@ -72,7 +70,6 @@ class Handlers:
 
         manager.dialog_data[key] = selected
         await handler.process_handler(manager, key, ActionType.ON_MULTISELECT)
-
 
     @staticmethod
     async def on_accept(
@@ -117,14 +114,10 @@ class WindowHandler(IWindowHandler, ABC):
         """Запускается при каждом действии (HandlerActionType) в каждом окне (вопросе) диалога (анкеты).
         Переопределите данный метод для внедрения собственной логики взаимодействия с данными
         """
-        pass
 
     @staticmethod
     async def end_handler(manager: DialogManager):
         try:
             await manager.next()
         except IndexError:
-            print('end')
-            await manager.done(
-                result={"dialog_data": manager.dialog_data}
-            )  # TODO: пока не ясно, с каким ключом надо возвращать дату
+            await manager.done(result=manager.dialog_data)
