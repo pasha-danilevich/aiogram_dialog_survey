@@ -1,0 +1,29 @@
+# .pre-commit-config.yaml
+# данные действия надо провести локально, для каждого .git
+# 1. install pre-commit
+# 2. $ pre-commit install (установить настройки в .git/hooks/pre-commit)
+#    или poetry run pre-commit install (если команды pre-commit install не существует)
+
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+    -   id: check-yaml
+    -   id: end-of-file-fixer # добавляет пустую строку в конец файла
+    -   id: trailing-whitespace # Удаляет пробелы в конце строк
+    -   id: check-ast # Проверяет синтаксис Python без выполнения кода
+-   repo: https://github.com/PyCQA/autoflake
+    rev: v2.2.0
+    hooks:
+      - id: autoflake
+        args: ["--in-place", "--remove-all-unused-imports"]
+-   repo: https://github.com/psf/black
+    rev: 23.9.0
+    hooks:
+    -   id: black
+-   repo: https://github.com/pycqa/isort
+    rev: 6.0.1
+    hooks:
+    -   id: isort
+        name: isort (python)
+        args: [--settings=pyproject.toml]

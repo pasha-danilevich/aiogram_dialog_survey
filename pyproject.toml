@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiogram-dialog-survey"
-version = "0.1.0"
+version = "0.1.1"
 description = "Quick and easy creation of surveys, questionnaires, and forms using aiogram-dialog"
 authors = ["Pavel Danilevich <danilevitch.pasha@yandex.ru>"]
 
@@ -19,14 +19,23 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
+packages = [
+    { include = "aiogram_dialog_survey" },
+]
 
 [tool.poetry.dependencies]
 python = ">=3.9"
 aiogram = ">=3.14.0"
 aiogram-dialog = ">=2.3.1"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 build = "^1.2.2.post1"
+black = "^25.1.0"
+isort = "^6.0.1"
+pre-commit = "^4.2.0"
+
+
+
 
 [tool.poetry.urls]
 homepage = "https://github.com/pasha-danilevich/aiogram_dialog_survey"
@@ -40,10 +49,14 @@ bug-tracker = "https://github.com/pasha-danilevich/aiogram_dialog_survey/issues"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.black]
+line-length = 88
+skip-string-normalization = true
+preview = true
 
 
-
-
-
-
-
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
