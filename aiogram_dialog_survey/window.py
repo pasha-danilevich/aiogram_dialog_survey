@@ -14,7 +14,7 @@ from aiogram_dialog_survey.state import StateGroupFactory
 
 class Wrapper:
     state_generator = StateGroupFactory
-    start_message = "Header. Начальное сообщение"
+    start_message = "Заполните, пожалуйста, анкету"
     end_message = "Анкета заполнена успешно"
 
     @classmethod

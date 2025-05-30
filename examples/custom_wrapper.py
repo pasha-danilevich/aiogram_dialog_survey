@@ -11,10 +11,11 @@ from aiogram_dialog import (
     Window,
     setup_dialogs,
 )
-from aiogram_dialog.widgets.kbd import Button
+from aiogram_dialog.widgets.kbd import Button, Start
 from aiogram_dialog.widgets.text import Const
 
-from aiogram_dialog_survey import StartSurvey, Survey
+from aiogram_dialog_survey import Survey
+from aiogram_dialog_survey.window import Wrapper
 from examples import env, survey_static
 
 API_TOKEN = env.TOKEN
@@ -24,16 +25,22 @@ class MainSG(StatesGroup):
     default = State()
 
 
-survey_data = survey_static.survey
+survey = survey_static.survey
 
-survey = Survey(name='survey', questions=survey_data)
-survey_dialog = survey.to_dialog()
+
+class MyCustomWrapper(Wrapper):
+    start_message = 'my custom start message'
+
+
+factory = Survey(name='some', questions=survey, wrapper=MyCustomWrapper)
+start_state = factory.get_first_state()
+questionnaire_dialog = factory.to_dialog()
 
 main_menu = Dialog(
     Window(
         Const("Привет. Это бот"),
         Button(Const("Выполни какое-то действие"), id="some_action"),
-        StartSurvey(Const("Пройти IT опрос"), survey),
+        Start(Const("Пройти опрос"), id="survey", state=start_state),
         state=MainSG.default,
     ),
 )
@@ -47,7 +54,7 @@ async def main():
     storage = MemoryStorage()
     bot = Bot(token=API_TOKEN)
     dp = Dispatcher(storage=storage)
-    dp.include_routers(main_menu, survey_dialog)
+    dp.include_routers(main_menu, questionnaire_dialog)
 
     dp.message.register(start, CommandStart())
     setup_dialogs(dp)

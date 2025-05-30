@@ -1,111 +1,151 @@
 from abc import ABC, abstractmethod
-from typing import Union, Tuple, Type
+from typing import Optional, Tuple, Type, Union
 
 from aiogram import F
-from aiogram_dialog.widgets.input import TextInput
+from aiogram.fsm.state import State
+from aiogram_dialog.api.entities import Data, ShowMode, StartMode
+from aiogram_dialog.widgets.common import WhenCondition
+from aiogram_dialog.widgets.input import TextInput as AiogramTextInput
 from aiogram_dialog.widgets.kbd import Button as AiogramDialogButton
 from aiogram_dialog.widgets.kbd import Column
 from aiogram_dialog.widgets.kbd import Multiselect as AiogramDialogMultiselect
 from aiogram_dialog.widgets.kbd import Select as AiogramDialogSelect
-from aiogram_dialog.widgets.text import Format, Const
+from aiogram_dialog.widgets.kbd import Start as AiogramDialogStart
+from aiogram_dialog.widgets.kbd.button import OnClick
+from aiogram_dialog.widgets.text import Const, Format, Text
 
-from aiogram_dialog_survey.interface import QuestionDict, IWindowHandler, ActionType, QuestionType
+from aiogram_dialog_survey.interface import (
+    ActionType,
+    IWindowHandler,
+    QuestionDict,
+    QuestionType,
+)
 
 WidgetButton = Tuple[str, Union[str, int]]
 
 
 class Widget(ABC):
-	@abstractmethod
-	def __init__(self, question: QuestionDict, handler: IWindowHandler):
-		pass
+    @abstractmethod
+    def __init__(self, question: QuestionDict, handler: IWindowHandler):
+        pass
 
-	@abstractmethod
-	def create(self):
-		pass
+    @abstractmethod
+    def create(self):
+        pass
 
 
 class BaseWidget(Widget):
-	def __init__(self, question: QuestionDict, handler: IWindowHandler):
-		self.question = question
-		self.handler = handler
+    def __init__(self, question: QuestionDict, handler: IWindowHandler):
+        self.question = question
+        self.handler = handler
 
-	def create(self):
-		raise NotImplementedError
+    def create(self):
+        raise NotImplementedError
 
-	@property
-	def item_id_getter(self):
-		return lambda x: x[1]
+    @property
+    def item_id_getter(self):
+        return lambda x: x[1]
 
-	def create_items(self) -> list[WidgetButton]:
-		return [(x['text'], x['id']) for x in self.question["options"]]
+    def create_items(self) -> list[WidgetButton]:
+        return [(x['text'], x['id']) for x in self.question["options"]]
 
 
-class Text(BaseWidget):
-	def create(self):
-		return TextInput(
-			id=f'input_{self.question["name"]}',
-			on_success=self.handler.get_handler(ActionType.ON_INPUT_SUCCESS),
-			type_factory=str,
-		)
+class TextInput(BaseWidget):
+    def create(self):
+        return AiogramTextInput(
+            id=f'input_{self.question["name"]}',
+            on_success=self.handler.get_handler(ActionType.ON_INPUT_SUCCESS),
+            type_factory=str,
+        )
 
 
 class Select(BaseWidget):
-	def create(self):
-		return Column(
-			AiogramDialogSelect(
-				text=Format("{item[0]}"),
-				id=f'select_{self.question["name"]}',
-				item_id_getter=self.item_id_getter,
-				items=self.create_items(),
-				on_click=self.handler.get_handler(
-					ActionType.ON_SELECT
-				),  # используем partial
-			)
-		)
+    def create(self):
+        return Column(
+            AiogramDialogSelect(
+                text=Format("{item[0]}"),
+                id=f'select_{self.question["name"]}',
+                item_id_getter=self.item_id_getter,
+                items=self.create_items(),
+                on_click=self.handler.get_handler(
+                    ActionType.ON_SELECT
+                ),  # используем partial
+            )
+        )
 
 
 class Multiselect(BaseWidget):
-	ACCEPT_BUTTON_TEXT = "Подтвердить выбор"
+    ACCEPT_BUTTON_TEXT = "Подтвердить выбор"
 
-	def create(self):
-		return Column(
-			AiogramDialogMultiselect(
-				Format("✓ {item[0]}"),  # Selected item format
-				Format("{item[0]}"),  # Unselected item format
-				id=f'multi_{self.question["name"]}',
-				item_id_getter=self.item_id_getter,
-				items=self.create_items(),
-				on_click=self.handler.get_handler(ActionType.ON_MULTISELECT),
-			),
-			AiogramDialogButton(
-				Const(self.ACCEPT_BUTTON_TEXT),
-				id='__accept__',
-				on_click=self.handler.get_handler(ActionType.ON_ACCEPT),
-				when=F["dialog_data"][self.handler.get_widget_key()].len()
-					 > 0,  # Only show when items are selected
-			),
-		)
+    def create(self):
+        return Column(
+            AiogramDialogMultiselect(
+                Format("✓ {item[0]}"),  # Selected item format
+                Format("{item[0]}"),  # Unselected item format
+                id=f'multi_{self.question["name"]}',
+                item_id_getter=self.item_id_getter,
+                items=self.create_items(),
+                on_click=self.handler.get_handler(ActionType.ON_MULTISELECT),
+            ),
+            AiogramDialogButton(
+                Const(self.ACCEPT_BUTTON_TEXT),
+                id='__accept__',
+                on_click=self.handler.get_handler(ActionType.ON_ACCEPT),
+                when=F["dialog_data"][self.handler.get_widget_key()].len()
+                > 0,  # Only show when items are selected
+            ),
+        )
 
 
 class WidgetManager:
-	@staticmethod
-	def get_widget(question_type: QuestionType) -> Type[Widget]:
-		match question_type:
-			case QuestionType.MULTISELECT:
-				return Multiselect
-			case QuestionType.SELECT:
-				return Select
-			case QuestionType.TEXT:
-				return Text
+    @staticmethod
+    def get_widget(question_type: QuestionType) -> Type[Widget]:
+        match question_type:
+            case QuestionType.MULTISELECT:
+                return Multiselect
+            case QuestionType.SELECT:
+                return Select
+            case QuestionType.TEXT:
+                return TextInput
 
-		raise ValueError("Unknown question type")
+        raise ValueError("Unknown question type")
 
-	@staticmethod
-	def get_skip_button(question: QuestionDict, handler: IWindowHandler) -> AiogramDialogButton | Const:
-		if not question["is_required"]:
-			return AiogramDialogButton(
-				Const("Пропустить вопрос"),
-				id=f'skip_{question["name"]}',
-				on_click=handler.get_handler(ActionType.ON_SKIP),
-			)
-		return Const('')  # пустая кнопка
+    @staticmethod
+    def get_skip_button(
+        question: QuestionDict, handler: IWindowHandler
+    ) -> AiogramDialogButton | Const:
+        if not question["is_required"]:
+            return AiogramDialogButton(
+                Const("Пропустить вопрос"),
+                id=f'skip_{question["name"]}',
+                on_click=handler.get_handler(ActionType.ON_SKIP),
+            )
+        return Const('')  # пустая кнопка
+
+    @staticmethod
+    def get_start_button(text: str, state: State) -> AiogramDialogStart:
+        return AiogramDialogStart(Const(text), id='start_survey', state=state)
+
+
+class StartSurvey(AiogramDialogStart):
+    def __init__(
+        self,
+        text: Text,
+        survey: 'Survey',
+        id: str = "survey",
+        data: Data = None,
+        on_click: Optional[OnClick] = None,
+        show_mode: Optional[ShowMode] = None,
+        mode: StartMode = StartMode.NORMAL,
+        when: WhenCondition = None,
+    ):
+        super().__init__(
+            text=text,
+            id=id,
+            state=survey.state_manager.get_first_state(),
+            data=data,
+            on_click=on_click,
+            show_mode=show_mode,
+            mode=mode,
+            when=when,
+        )
