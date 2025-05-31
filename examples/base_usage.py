@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
@@ -17,6 +18,9 @@ from aiogram_dialog.widgets.text import Const
 from aiogram_dialog_survey import StartSurvey, Survey
 from examples import env, survey_static
 
+logging.getLogger('aiogram_dialog_survey').setLevel(logging.DEBUG)
+logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s')
+
 API_TOKEN = env.TOKEN
 
 
@@ -26,7 +30,7 @@ class MainSG(StatesGroup):
 
 survey_data = survey_static.survey
 
-survey = Survey(name='survey', questions=survey_data)
+survey = Survey(name='survey', questions=survey_data, use_numbering=False)
 survey_dialog = survey.to_dialog()
 
 main_menu = Dialog(
@@ -44,15 +48,13 @@ async def start(message: Message, dialog_manager: DialogManager):
 
 
 async def main():
-    storage = MemoryStorage()
-    bot = Bot(token=API_TOKEN)
-    dp = Dispatcher(storage=storage)
+    dp = Dispatcher(storage=MemoryStorage())
     dp.include_routers(main_menu, survey_dialog)
-
     dp.message.register(start, CommandStart())
+
     setup_dialogs(dp)
-    print('bot started')
-    await dp.start_polling(bot)
+
+    await dp.start_polling(Bot(token=API_TOKEN))
 
 
 if __name__ == "__main__":

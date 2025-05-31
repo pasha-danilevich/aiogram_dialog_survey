@@ -1,3 +1,4 @@
+import logging
 from abc import ABC
 from functools import partial
 
@@ -7,6 +8,8 @@ from aiogram_dialog.widgets.input import ManagedTextInput
 from aiogram_dialog.widgets.kbd import Button, Multiselect, Select
 
 from aiogram_dialog_survey.interface import ActionType, IWindowHandler, QuestionName
+
+logger = logging.getLogger(__name__)
 
 
 class Handlers:
@@ -109,15 +112,33 @@ class WindowHandler(IWindowHandler, ABC):
 
     @staticmethod
     async def process_handler(
-        manager: DialogManager, widget_key: QuestionName, action_type: ActionType
+        manager: DialogManager, question_name: QuestionName, action_type: ActionType
     ) -> None:
-        """Запускается при каждом действии (HandlerActionType) в каждом окне (вопросе) диалога (анкеты).
-        Переопределите данный метод для внедрения собственной логики взаимодействия с данными
+        """Обрабатывает пользовательское действие в контексте текущего вопроса диалога.
+
+        Вызывается автоматически при любом взаимодействии пользователя с интерфейсом.
+        Позволяет реализовать кастомную логику обработки данных для конкретного вопроса.
+
+        Args:
+            manager: Менеджер диалога, содержащий текущий контекст
+            question_name: Идентификатор текущего вопроса анкеты
+            action_type: Тип выполненного пользователем действия
         """
+        logger.info(
+            'Обработка действия "%s" для вопроса "%s" | Данные: %s',
+            action_type,
+            question_name,
+            manager.dialog_data.get(question_name, 'нет данных'),
+        )
 
     @staticmethod
     async def end_handler(manager: DialogManager):
         try:
             await manager.next()
         except IndexError:
-            await manager.done(result=manager.dialog_data)
+            result_data = manager.dialog_data
+            logger.info(
+                'Анкетирование завершилось. Собранные данные: %s',
+                result_data,
+            )
+            await manager.done(result=result_data)
