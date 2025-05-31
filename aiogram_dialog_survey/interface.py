@@ -1,10 +1,11 @@
 # interface.py
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from enum import StrEnum
-from typing import Awaitable, Callable, List, Optional, Protocol
+from typing import Awaitable, Callable, List, Optional, Protocol, TypeVar
 
+from aiogram.types import Message
 from aiogram_dialog import DialogManager
-from pydantic import BaseModel, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 QuestionName = str
 
@@ -31,12 +32,29 @@ class Button(BaseModel):
         return v
 
 
+T = TypeVar("T")
+TypeFactory = Callable[[str], T]
+
+
+class AbstractValidator(ABC):
+    def __init__(self, type_factory: TypeFactory):
+        self.type_factory = type_factory
+
+    @staticmethod
+    @abstractmethod
+    async def on_error(message: Message, _, __, error: ValueError):
+        pass
+
+
 class Question(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     name: str
     question_type: QuestionType
     text: str
     is_required: bool
     buttons: Optional[List[Button]] = None
+    validator: Optional[AbstractValidator] = None
 
     @model_validator(mode='after')
     def validate_buttons_based_on_type(self) -> 'Question':

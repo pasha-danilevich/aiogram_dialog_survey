@@ -1,6 +1,17 @@
 from typing import List
 
 from aiogram_dialog_survey.interface import Button, Question, QuestionType
+from aiogram_dialog_survey.widgets import Validator
+
+
+def validate_int(text: str) -> int:
+    try:
+        text = int(text)
+    except ValueError:
+        # В ValueError можно передать текст сообщения, который появится у пользователя
+        raise ValueError('Возраст нужно написать цифрой. Например: 27')
+    return text
+
 
 # Опросник из 4 вопросов на тему IT
 survey: List[Question] = [
@@ -21,6 +32,7 @@ survey: List[Question] = [
         question_type=QuestionType.TEXT,
         text="Сколько лет вы занимаетесь программированием?",
         is_required=True,
+        validator=Validator(validate_int),
     ),
     Question(
         name="preferred_tools",

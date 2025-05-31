@@ -4,6 +4,7 @@ from typing import Optional, Tuple, Type, Union
 
 from aiogram import F
 from aiogram.fsm.state import State
+from aiogram.types import Message
 from aiogram_dialog.api.entities import Data, ShowMode, StartMode
 from aiogram_dialog.widgets.common import WhenCondition
 from aiogram_dialog.widgets.input import TextInput as AiogramTextInput
@@ -16,6 +17,7 @@ from aiogram_dialog.widgets.kbd.button import OnClick
 from aiogram_dialog.widgets.text import Const, Format, Text
 
 from aiogram_dialog_survey.interface import (
+    AbstractValidator,
     ActionType,
     IWindowHandler,
     Question,
@@ -56,7 +58,8 @@ class TextInput(BaseWidget):
         return AiogramTextInput(
             id=f'input_{self.question.name}',
             on_success=self.handler.get_handler(ActionType.ON_INPUT_SUCCESS),
-            type_factory=str,
+            type_factory=self.question.validator.type_factory,
+            on_error=self.question.validator.on_error,
         )
 
 
@@ -150,3 +153,9 @@ class StartSurvey(AiogramDialogStart):
             mode=mode,
             when=when,
         )
+
+
+class Validator(AbstractValidator):
+    @staticmethod
+    async def on_error(message: Message, _, __, error: ValueError):
+        await message.answer(str(error))
