@@ -12,7 +12,7 @@ from aiogram_dialog.widgets.kbd import (
 from aiogram_dialog.widgets.text import Const
 
 from aiogram_dialog_survey.handler import WindowHandler
-from aiogram_dialog_survey.interface import IWindowHandler, QuestionDict
+from aiogram_dialog_survey.interface import IWindowHandler, Question
 from aiogram_dialog_survey.state import StateManager
 from aiogram_dialog_survey.widgets import WidgetManager
 
@@ -23,7 +23,7 @@ class Survey:
     def __init__(
         self,
         name: str,
-        questions: list[QuestionDict],
+        questions: list[Question],
         use_numbering: bool = True,
         handler: Type[IWindowHandler] = WindowHandler,
         state_manager: Type[StateManager] = StateManager,
@@ -68,18 +68,18 @@ class Survey:
         questionnaire_length = len(self.questions)
 
         for order, question in enumerate(self.questions):
-            handler = self._handler(question_name=question["name"])
+            handler = self._handler(question_name=question.name)
             sequence_question_label = (
                 Const(f"Вопрос {order + 1}/{questionnaire_length}")
                 if self.use_numbering
                 else Const("")
             )
-            widget = self.widget_manager.get_widget(question["question_type"])
+            widget = self.widget_manager.get_widget(question.question_type)
             static_buttons = self._get_static_buttons(order)
 
             window = Window(
                 sequence_question_label,
-                Const(f"{question['text']}"),
+                Const(f"{question.text}"),
                 widget(question, handler).create(),
                 Group(
                     *[
@@ -88,7 +88,7 @@ class Survey:
                     ],
                     width=2,
                 ),
-                state=getattr(self._state_group, question["name"]),
+                state=getattr(self._state_group, question.name),
             )
 
             windows.append(window)

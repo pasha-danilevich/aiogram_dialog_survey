@@ -2,7 +2,7 @@ from typing import List, Type
 
 from aiogram.fsm.state import State, StatesGroup
 
-from aiogram_dialog_survey.interface import QuestionDict
+from aiogram_dialog_survey.interface import Question
 
 
 class StateGroupFactory(StatesGroup):
@@ -30,10 +30,10 @@ class StateGroupFactory(StatesGroup):
 
 
 class StateManager(StateGroupFactory):
-    def __init__(self, name: str, questions: list[QuestionDict]):
+    def __init__(self, name: str, questions: list[Question]):
         self.state_group = self.create_state_group(
             name.title(),
-            [question["name"] for question in questions],
+            [question.name for question in questions],
         )
 
     def get_first_state(self) -> State:
