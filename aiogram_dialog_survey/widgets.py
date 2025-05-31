@@ -1,3 +1,4 @@
+# widgets.py
 from abc import ABC, abstractmethod
 from typing import Optional, Tuple, Type, Union
 

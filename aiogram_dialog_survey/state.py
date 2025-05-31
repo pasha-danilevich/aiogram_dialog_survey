@@ -1,3 +1,4 @@
+# state.py
 from typing import List, Type
 
 from aiogram.fsm.state import State, StatesGroup

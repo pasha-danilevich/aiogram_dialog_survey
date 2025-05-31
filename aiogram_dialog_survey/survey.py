@@ -1,4 +1,4 @@
-import logging
+# survey.py
 from typing import List, Optional, Type
 
 from aiogram_dialog import Dialog, Window
@@ -15,8 +15,6 @@ from aiogram_dialog_survey.handler import WindowHandler
 from aiogram_dialog_survey.interface import IWindowHandler, Question
 from aiogram_dialog_survey.state import StateManager
 from aiogram_dialog_survey.widgets import WidgetManager
-
-logger = logging.getLogger(__name__)
 
 
 class Survey:

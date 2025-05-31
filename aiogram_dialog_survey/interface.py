@@ -1,3 +1,4 @@
+# interface.py
 from abc import abstractmethod
 from enum import StrEnum
 from typing import Awaitable, Callable, List, Optional, Protocol
@@ -96,5 +97,5 @@ class IWindowHandler(Protocol):
 
     @staticmethod
     @abstractmethod
-    async def end_handler(manager: DialogManager):
+    async def next_or_done(manager: DialogManager):
         pass

@@ -1,3 +1,4 @@
+# handler.py
 import logging
 from abc import ABC
 from functools import partial
@@ -25,7 +26,7 @@ class Handlers:
         manager.dialog_data[key] = item_id
 
         await handler.process_handler(manager, key, ActionType.ON_SELECT)
-        await handler.end_handler(manager)
+        await handler.next_or_done(manager)
 
     @staticmethod
     async def skip(
@@ -38,7 +39,7 @@ class Handlers:
         manager.dialog_data[key] = handler.SKIP_CONST
 
         await handler.process_handler(manager, key, ActionType.ON_SKIP)
-        await handler.end_handler(manager)
+        await handler.next_or_done(manager)
 
     @staticmethod
     async def input(
@@ -52,7 +53,7 @@ class Handlers:
         manager.dialog_data[key] = text
 
         await handler.process_handler(manager, key, ActionType.ON_INPUT_SUCCESS)
-        await handler.end_handler(manager)
+        await handler.next_or_done(manager)
 
     @staticmethod
     async def multiselect(
@@ -84,7 +85,7 @@ class Handlers:
         key = handler.get_widget_key()
 
         await handler.process_handler(manager, key, ActionType.ON_ACCEPT)
-        await handler.end_handler(manager)
+        await handler.next_or_done(manager)
 
 
 class WindowHandler(IWindowHandler, ABC):
@@ -132,7 +133,7 @@ class WindowHandler(IWindowHandler, ABC):
         )
 
     @staticmethod
-    async def end_handler(manager: DialogManager):
+    async def next_or_done(manager: DialogManager):
         try:
             await manager.next()
         except IndexError:
