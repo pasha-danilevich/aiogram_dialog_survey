@@ -1,6 +1,7 @@
 # examples/base_usage.py
 import asyncio
 import logging
+from typing import Any
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
@@ -8,6 +9,7 @@ from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Message
 from aiogram_dialog import (
+    Data,
     Dialog,
     DialogManager,
     Window,
@@ -23,8 +25,7 @@ logging.getLogger('aiogram_dialog_survey').setLevel(logging.DEBUG)
 logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s')
 
 
-survey_data = survey_static.survey
-survey = Survey(name='survey', questions=survey_data)
+survey = Survey(name='survey', questions=survey_static.survey)
 survey_dialog = survey.to_dialog()
 
 
@@ -32,6 +33,14 @@ class MainSG(StatesGroup):
     start = State()
     middle = State()
     end = State()
+    result = State()
+
+
+async def survey_result_handler(
+    start_data: Data, result: Any, dialog_manager: DialogManager
+):
+    print("Результаты анкеты:", result)
+    await dialog_manager.switch_to(MainSG.result)
 
 
 main_menu = Dialog(
@@ -43,15 +52,19 @@ main_menu = Dialog(
     Window(
         Const("Было бы здорово, если бы ты рассказал про себя немного больше"),
         Next(Const("Не хочу"), id="no"),
-        StartSurvey(
-            Const("Рассказать"), survey
-        ),  # TODO: сделать более наглядный пример с обработчиком результата
+        StartSurvey(Const("Рассказать"), survey),
         state=MainSG.middle,
+        on_process_result=survey_result_handler,
     ),
     Window(
         Const("Очень жаль("),
         SwitchTo(Const("Заново"), id='again', state=MainSG.start),
         state=MainSG.end,
+    ),
+    Window(
+        Const("Спасибо за информацию"),
+        SwitchTo(Const("Заново"), id='again', state=MainSG.start),
+        state=MainSG.result,
     ),
 )
 

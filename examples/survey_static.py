@@ -9,7 +9,7 @@ def validate_int(text: str) -> int:
         text = int(text)
     except ValueError:
         # В ValueError можно передать текст сообщения, который появится у пользователя
-        raise ValueError('Возраст нужно написать цифрой. Например: 27')
+        raise ValueError('Нужно написать цифрой. Например: 3')
     return text
 
 
