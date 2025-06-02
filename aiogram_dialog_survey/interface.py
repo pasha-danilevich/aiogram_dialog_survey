@@ -4,7 +4,7 @@ from enum import StrEnum
 from typing import Awaitable, Callable, List, Optional, Protocol, TypeVar, Type
 
 from aiogram.types import Message
-from aiogram_dialog import DialogManager
+from aiogram_dialog import DialogManager, Data
 from aiogram_dialog.dialog import OnDialogEvent, OnResultEvent, Dialog
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -104,7 +104,7 @@ class ActionType(StrEnum):
 
 class IWindowHandler(Protocol):
     @abstractmethod
-    def __init__(self, question_name: str):
+    def __init__(self, survey_name: str, question_name: str):
         pass
 
     @abstractmethod
@@ -121,6 +121,12 @@ class IWindowHandler(Protocol):
         manager: DialogManager, widget_key: QuestionName, action_type: ActionType
     ) -> None:
         """Запускается при каждом действии в каждом окне. Переопределите данный метод для внедрения собственной логики"""
+    
+    @staticmethod
+    async def process_survey_result(
+        manager: DialogManager, result: Data
+    ) -> None:
+        """Функция запускается в конце анкетирования, после последнего ответа"""
 
     @staticmethod
     @abstractmethod

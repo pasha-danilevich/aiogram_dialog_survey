@@ -24,10 +24,10 @@ class Handlers:
     ):
         key = handler.get_widget_key()
         manager.dialog_data[key] = item_id
-
+        
         await handler.process_handler(manager, key, ActionType.ON_SELECT)
         await handler.next_or_done(manager)
-
+    
     @staticmethod
     async def skip(
         callback: CallbackQuery,
@@ -37,10 +37,10 @@ class Handlers:
     ):
         key = handler.get_widget_key()
         manager.dialog_data[key] = handler.SKIP_CONST
-
+        
         await handler.process_handler(manager, key, ActionType.ON_SKIP)
         await handler.next_or_done(manager)
-
+    
     @staticmethod
     async def input(
         message: Message,
@@ -51,10 +51,10 @@ class Handlers:
     ):
         key = handler.get_widget_key()
         manager.dialog_data[key] = text
-
+        
         await handler.process_handler(manager, key, ActionType.ON_INPUT_SUCCESS)
         await handler.next_or_done(manager)
-
+    
     @staticmethod
     async def multiselect(
         callback: CallbackQuery,
@@ -66,15 +66,15 @@ class Handlers:
         """Обработка множественного выбора"""
         key = handler.get_widget_key()
         selected = manager.dialog_data.setdefault(key, [])
-
+        
         if item_id in selected:
             selected.remove(item_id)
         else:
             selected.append(item_id)
-
+        
         manager.dialog_data[key] = selected
         await handler.process_handler(manager, key, ActionType.ON_MULTISELECT)
-
+    
     @staticmethod
     async def on_accept(
         callback: CallbackQuery,
@@ -83,20 +83,21 @@ class Handlers:
         handler: 'WindowHandler',
     ):
         key = handler.get_widget_key()
-
+        
         await handler.process_handler(manager, key, ActionType.ON_ACCEPT)
         await handler.next_or_done(manager)
 
 
 class WindowHandler(IWindowHandler, ABC):
     SKIP_CONST = "__skipped__"
-
-    def __init__(self, question_name: str):
+    
+    def __init__(self, survey_name: str, question_name: str):
+        self.survey_name = survey_name
         self.question_name = question_name
-
+    
     def get_widget_key(self) -> QuestionName:
         return self.question_name
-
+    
     def get_handler(self, action_type: ActionType):
         match action_type:
             case ActionType.ON_SELECT:
@@ -110,9 +111,9 @@ class WindowHandler(IWindowHandler, ABC):
             case ActionType.ON_ACCEPT:
                 return partial(Handlers.on_accept, handler=self)
         raise ValueError("Unknown action type")
-
-    @staticmethod
+    
     async def process_handler(
+        self,
         manager: DialogManager, question_name: QuestionName, action_type: ActionType
     ) -> None:
         """Обрабатывает пользовательское действие в контексте текущего вопроса диалога.
@@ -132,8 +133,8 @@ class WindowHandler(IWindowHandler, ABC):
             manager.dialog_data.get(question_name, 'нет данных'),
         )
     
-    @staticmethod
     async def process_survey_result(
+        self,
         manager: DialogManager, result: Data
     ) -> None:
         """Функция запускается в конце анкетирования, после последнего ответа"""
@@ -141,8 +142,7 @@ class WindowHandler(IWindowHandler, ABC):
             'Анкетирование завершилось. Собранные данные: %s',
             result,
         )
-
-
+    
     async def next_or_done(self, manager: DialogManager):
         try:
             await manager.next()

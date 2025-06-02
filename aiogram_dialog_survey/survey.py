@@ -66,7 +66,7 @@ class Survey:
         questionnaire_length = len(self.questions)
 
         for order, question in enumerate(self.questions):
-            handler = self._handler(question_name=question.name)
+            handler = self._handler(survey_name=self.name, question_name=question.name)
             sequence_question_label = (
                 Const(f"Вопрос {order + 1}/{questionnaire_length}")
                 if self.use_numbering
