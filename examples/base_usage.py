@@ -17,7 +17,7 @@ from aiogram_dialog.widgets.kbd import Next, SwitchTo
 from aiogram_dialog.widgets.text import Const
 
 from aiogram_dialog_survey import StartSurvey, Survey
-from examples import env, survey_static
+from examples import survey_static
 
 logging.getLogger('aiogram_dialog_survey').setLevel(logging.DEBUG)
 logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s')
