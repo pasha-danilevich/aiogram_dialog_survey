@@ -67,7 +67,7 @@ async def main():
 
     setup_dialogs(dp)
 
-    await dp.start_polling(Bot(token=env.TOKEN))
+    await dp.start_polling(Bot(token='7886751328:AAGMynt9zQhWqrgbe0gaNq3d-MaYZZ8IexQ'))
 
 
 if __name__ == "__main__":

@@ -56,7 +56,7 @@ class BaseWidget(Widget):
 class TextInput(BaseWidget):
     def create(self):
         return AiogramTextInput(
-            id=f'input_{self.question.name}',
+            id=f'input_{self.question.name.strip()}',
             on_success=self.handler.get_handler(ActionType.ON_INPUT_SUCCESS),
             type_factory=self.question.validator.type_factory,
             on_error=self.question.validator.on_error,
@@ -68,7 +68,7 @@ class Select(BaseWidget):
         return Column(
             AiogramDialogSelect(
                 text=Format("{item[0]}"),
-                id=f'select_{self.question.name}',
+                id=f'select_{self.question.name.strip()}',
                 item_id_getter=self.item_id_getter,
                 items=self.create_buttons(),
                 on_click=self.handler.get_handler(
@@ -86,7 +86,7 @@ class Multiselect(BaseWidget):
             AiogramDialogMultiselect(
                 Format("✓ {item[0]}"),  # Selected item format
                 Format("{item[0]}"),  # Unselected item format
-                id=f'multi_{self.question.name}',
+                id=f'multi_{self.question.name.strip()}',
                 item_id_getter=self.item_id_getter,
                 items=self.create_buttons(),
                 on_click=self.handler.get_handler(ActionType.ON_MULTISELECT),
@@ -121,7 +121,7 @@ class WidgetManager:
         if not question.is_required:
             return AiogramDialogButton(
                 Const("Пропустить вопрос"),
-                id=f'skip_{question.name}',
+                id=f'skip_{question.name.strip()}',
                 on_click=handler.get_handler(ActionType.ON_SKIP),
             )
         return AiogramDialogButton(Const(''), id='empty')  # пустая кнопка
