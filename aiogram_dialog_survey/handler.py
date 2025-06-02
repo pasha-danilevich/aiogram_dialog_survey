@@ -4,7 +4,7 @@ from abc import ABC
 from functools import partial
 
 from aiogram.types import CallbackQuery, Message
-from aiogram_dialog import DialogManager
+from aiogram_dialog import DialogManager, Data
 from aiogram_dialog.widgets.input import ManagedTextInput
 from aiogram_dialog.widgets.kbd import Button, Multiselect, Select
 
@@ -131,15 +131,22 @@ class WindowHandler(IWindowHandler, ABC):
             question_name,
             manager.dialog_data.get(question_name, 'нет данных'),
         )
-
+    
     @staticmethod
-    async def next_or_done(manager: DialogManager):
+    async def process_survey_result(
+        manager: DialogManager, result: Data
+    ) -> None:
+        """Функция запускается в конце анкетирования, после последнего ответа"""
+        logger.info(
+            'Анкетирование завершилось. Собранные данные: %s',
+            result,
+        )
+
+
+    async def next_or_done(self, manager: DialogManager):
         try:
             await manager.next()
         except IndexError:
             result_data = manager.dialog_data
-            logger.info(
-                'Анкетирование завершилось. Собранные данные: %s',
-                result_data,
-            )
+            await self.process_survey_result(manager, result_data)
             await manager.done(result=result_data)
