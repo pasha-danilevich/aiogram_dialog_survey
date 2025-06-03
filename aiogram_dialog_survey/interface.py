@@ -1,11 +1,10 @@
 # interface.py
 from abc import ABC, abstractmethod
 from enum import StrEnum
-from typing import Awaitable, Callable, List, Optional, Protocol, TypeVar, Type
+from typing import Awaitable, Callable, List, Optional, Protocol, TypeVar
 
 from aiogram.types import Message
 from aiogram_dialog import DialogManager, Data
-from aiogram_dialog.dialog import OnDialogEvent, OnResultEvent, Dialog
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 QuestionName = str
@@ -101,10 +100,12 @@ class ActionType(StrEnum):
     ON_ACCEPT = "on_accept"
     ON_SKIP = "on_skip"
 
+class ISurvey(Protocol):
+    pass
 
 class IWindowHandler(Protocol):
     @abstractmethod
-    def __init__(self, survey_name: str, question_name: str):
+    def __init__(self, survey: ISurvey, question: Question):
         pass
 
     @abstractmethod

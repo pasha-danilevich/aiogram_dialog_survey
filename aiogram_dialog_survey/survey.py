@@ -12,12 +12,12 @@ from aiogram_dialog.widgets.kbd import (
 from aiogram_dialog.widgets.text import Const
 
 from aiogram_dialog_survey.handler import WindowHandler
-from aiogram_dialog_survey.interface import IWindowHandler, Question
+from aiogram_dialog_survey.interface import IWindowHandler, Question, ISurvey
 from aiogram_dialog_survey.state import StateManager
 from aiogram_dialog_survey.widgets import WidgetManager
 
 
-class Survey:
+class Survey(ISurvey):
     def __init__(
         self,
         name: str,
@@ -66,7 +66,7 @@ class Survey:
         questionnaire_length = len(self.questions)
 
         for order, question in enumerate(self.questions):
-            handler = self._handler(survey_name=self.name, question_name=question.name)
+            handler = self._handler(survey=self, question=question)
             sequence_question_label = (
                 Const(f"Вопрос {order + 1}/{questionnaire_length}")
                 if self.use_numbering

@@ -8,7 +8,7 @@ from aiogram_dialog import DialogManager, Data
 from aiogram_dialog.widgets.input import ManagedTextInput
 from aiogram_dialog.widgets.kbd import Button, Multiselect, Select
 
-from aiogram_dialog_survey.interface import ActionType, IWindowHandler, QuestionName
+from aiogram_dialog_survey.interface import ActionType, IWindowHandler, QuestionName, ISurvey, Question
 
 logger = logging.getLogger(__name__)
 
@@ -91,9 +91,10 @@ class Handlers:
 class WindowHandler(IWindowHandler, ABC):
     SKIP_CONST = "__skipped__"
     
-    def __init__(self, survey_name: str, question_name: str):
-        self.survey_name = survey_name
-        self.question_name = question_name
+    def __init__(self, survey: ISurvey, question: Question):
+        self.survey = survey
+        self.question = question
+        self.question_name = question.name
     
     def get_widget_key(self) -> QuestionName:
         return self.question_name
