@@ -149,4 +149,3 @@ class WindowHandler(IWindowHandler, ABC):
         except IndexError:
             result_data = manager.dialog_data
             await self.process_survey_result(manager, result_data)
-            await manager.done(result=result_data)
