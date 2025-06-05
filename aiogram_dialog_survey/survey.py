@@ -26,7 +26,7 @@ class Survey(ISurvey):
         handler: Type[IWindowHandler] = WindowHandler,
         state_manager: Type[StateManager] = StateManager,
         widget_manager: Type[WidgetManager] = WidgetManager,
-        navigation_buttons: INavigationButtons = NavigationButtons,
+        navigation_buttons: Type[INavigationButtons] = NavigationButtons,
     ):
         self.name = name
         self.use_numbering = use_numbering
