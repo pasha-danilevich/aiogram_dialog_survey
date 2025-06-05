@@ -14,6 +14,7 @@ from aiogram_dialog.widgets.kbd import Multiselect as AiogramDialogMultiselect
 from aiogram_dialog.widgets.kbd import Select as AiogramDialogSelect
 from aiogram_dialog.widgets.kbd import Start as AiogramDialogStart
 from aiogram_dialog.widgets.kbd.button import OnClick
+from aiogram_dialog.widgets.kbd.state import EventProcessorButton, Cancel, Back
 from aiogram_dialog.widgets.text import Const, Format, Text
 
 from aiogram_dialog_survey.interface import (
@@ -21,7 +22,7 @@ from aiogram_dialog_survey.interface import (
     ActionType,
     IWindowHandler,
     Question,
-    QuestionType,
+    QuestionType, INavigationButtons,
 )
 
 WidgetButton = Tuple[str, Union[str, int]]
@@ -159,3 +160,19 @@ class Validator(AbstractValidator):
     @staticmethod
     async def on_error(message: Message, _, __, error: ValueError):
         await message.answer(str(error))
+
+
+class NavigationButtons(INavigationButtons):
+
+    @staticmethod
+    def get_buttons(order: int) -> list[AiogramDialogButton]:
+        buttons = []
+        
+        if order == 0:
+            pass
+        else:
+            buttons.append(Back(Const("Назад")))
+        
+        buttons.append(Cancel(Const("Отменить заполнение")))
+        
+        return buttons

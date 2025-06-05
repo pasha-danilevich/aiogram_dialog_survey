@@ -12,28 +12,31 @@ from aiogram_dialog.widgets.kbd import (
 from aiogram_dialog.widgets.text import Const
 
 from aiogram_dialog_survey.handler import WindowHandler
-from aiogram_dialog_survey.interface import IWindowHandler, Question, ISurvey
+from aiogram_dialog_survey.interface import IWindowHandler, Question, ISurvey, INavigationButtons
 from aiogram_dialog_survey.state import StateManager
-from aiogram_dialog_survey.widgets import WidgetManager
+from aiogram_dialog_survey.widgets import WidgetManager, NavigationButtons
 
 
 class Survey(ISurvey):
     def __init__(
         self,
         name: str,
-        questions: list[Question],
+        questions: list[Question], # FIXME: запретить передавать пустой список
         use_numbering: bool = True,
         handler: Type[IWindowHandler] = WindowHandler,
         state_manager: Type[StateManager] = StateManager,
         widget_manager: Type[WidgetManager] = WidgetManager,
+        navigation_buttons: INavigationButtons = NavigationButtons,
     ):
         self.name = name
         self.use_numbering = use_numbering
-        self._handler = handler
         self.questions = questions
         self.state_manager = state_manager(name=name, questions=questions)
         self.widget_manager = widget_manager
+        self.navigation_buttons = navigation_buttons
+        self._handler = handler
         self._state_group = self.state_manager.state_group
+        
 
     def to_dialog(
         self,
@@ -73,7 +76,7 @@ class Survey(ISurvey):
                 else Const("")
             )
             widget = self.widget_manager.get_widget(question.question_type)
-            static_buttons = self._get_static_buttons(order)
+            navigation_buttons = self.navigation_buttons.get_buttons(order)
 
             window = Window(
                 sequence_question_label,
@@ -81,7 +84,7 @@ class Survey(ISurvey):
                 widget(question, handler).create(),
                 Group(
                     *[
-                        *static_buttons,
+                        *navigation_buttons,
                         self.widget_manager.get_skip_button(question, handler),
                     ],
                     width=2,

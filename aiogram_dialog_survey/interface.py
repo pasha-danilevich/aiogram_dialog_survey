@@ -5,6 +5,7 @@ from typing import Awaitable, Callable, List, Optional, Protocol, TypeVar
 
 from aiogram.types import Message
 from aiogram_dialog import DialogManager, Data
+from aiogram_dialog.widgets.kbd.state import EventProcessorButton
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 QuestionName = str
@@ -132,4 +133,11 @@ class IWindowHandler(Protocol):
     @staticmethod
     @abstractmethod
     async def next_or_done(manager: DialogManager):
+        pass
+
+class INavigationButtons(Protocol):
+    
+    @staticmethod
+    @abstractmethod
+    def get_buttons(order: int) -> list[Button]:
         pass
