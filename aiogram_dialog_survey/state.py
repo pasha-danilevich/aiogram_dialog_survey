@@ -4,6 +4,7 @@ from typing import List, Type
 from aiogram.fsm.state import State, StatesGroup
 
 from aiogram_dialog_survey.interface import Question
+from examples.survey_static import survey
 
 
 class StateGroupFactory(StatesGroup):
@@ -46,5 +47,9 @@ class StateManager(StateGroupFactory):
         first_state_name = next(iter(state_attributes))
         return state_attributes[first_state_name]
     
-    def get(self, name: str) -> State:
+    def get_by_name(self, name: str) -> State:
         return getattr(self.state_group, name)
+    
+    def get_by_index(self, index: int) -> State:
+        return list(self.state_group)[index]
+    
