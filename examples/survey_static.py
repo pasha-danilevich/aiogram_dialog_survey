@@ -1,7 +1,9 @@
 from typing import List
 
-from aiogram_dialog_survey.interface import Button, Question, QuestionType
-from aiogram_dialog_survey.widgets import Validator
+from aiogram_dialog_survey.entities.button import Button
+from aiogram_dialog_survey.entities.question import QuestionType
+from aiogram_dialog_survey.interface import Question
+from aiogram_dialog_survey.validator import Validator
 
 
 def validate_int(text: str) -> int:

@@ -17,6 +17,7 @@ pip install aiogram_dialog_survey
 ```
 
 ### Минимальный пример бота
+
 ```python
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
@@ -24,7 +25,8 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram_dialog import DialogManager, setup_dialogs
 
 from aiogram_dialog_survey import Survey, StartSurvey
-from aiogram_dialog_survey.interface import Question, QuestionType, Button
+from aiogram_dialog_survey.entities.question import QuestionType, Question
+from aiogram_dialog_survey.entities.button import Button
 
 # Определяем вопросы анкеты
 questions = [
@@ -51,8 +53,10 @@ questions = [
 # Создаем анкету
 survey = Survey(name="user_survey", questions=questions)
 
+
 async def start_handler(message: types.Message, dialog_manager: DialogManager):
     await dialog_manager.start(survey.state_manager.get_first_state())
+
 
 async def main():
     bot = Bot(token="YOUR_BOT_TOKEN")
@@ -73,7 +77,9 @@ async def main():
 Вопросы определяются с помощью класса `Question`:
 
 ```python
-from aiogram_dialog_survey.interface import Question, QuestionType, Button
+from aiogram_dialog_survey.interface import Question
+from aiogram_dialog_survey.entities.question import QuestionType
+from aiogram_dialog_survey.entities.button import Button
 
 # Вопросы, их типы и варианты ответов можно хранить в БД или в любом другом удобном месте, чтобы не засорять кодовую базу проекта и сосредоточится на более важных аспектах
 questions = [
@@ -146,46 +152,57 @@ dp.include_router(survey.to_dialog())
 Вы можете создать собственный обработчик событий, унаследовавшись от `IWindowHandler`:
 
 ```python
-from aiogram_dialog_survey.interface import IWindowHandler, ActionType
+
+from aiogram_dialog_survey.protocols.handler import HandlerProtocol
+from aiogram_dialog_survey.entities.action_type import ActionType
 from aiogram_dialog import DialogManager
 
-class CustomHandler(IWindowHandler):
+
+class CustomHandler(HandlerProtocol):
     @staticmethod
     async def process_handler(
         manager: DialogManager,
         question_name: str,
         action_type: ActionType
     ) -> None:
-	    answer = manager.dialog_data.get(question_name)
+        answer = manager.dialog_data.get(question_name)
         # Кастомная логика обработки событий
-        print(f"Пользователь ответил: "{answer}" на вопрос {question_name}")
 
-# Использование кастомного обработчика
-survey = Survey(
-    name="custom_survey",
-    questions=questions,
-    handler=CustomHandler
-)
+    print(f"Пользователь ответил: "
+    {answer}
+    " на вопрос {question_name}")
+
+    # Использование кастомного обработчика
+    survey = Survey(
+        name="custom_survey",
+        questions=questions,
+        handler=CustomHandler
+    )
 ```
 Такой обработчик отлично подойдет, если вы хотите каждый раз, когда пользователь отвечает на вопрос, обрабатывать его и, допустим, записывать в БД ответ пользователя и его прогресс прохождения анкеты.
 
 В `process_handler` вы так же можете запускать еще `subdialog` в зависимости от ответа
+
 ```python
-from aiogram_dialog_survey.interface import IWindowHandler, ActionType
+
+from aiogram_dialog_survey.protocols.handler import HandlerProtocol
+from aiogram_dialog_survey.entities.action_type import ActionType
 from aiogram_dialog import DialogManager
 
 from your_module import music_artist_survey
 
-class CustomHandler(IWindowHandler):
+
+class CustomHandler(HandlerProtocol):
     @staticmethod
     async def process_handler(
         manager: DialogManager,
         question_name: str,
         action_type: ActionType
     ) -> None:
-	    answer = manager.dialog_data.get(question_name)
-        if question_name == 'do_you_like_music' and answer == 'yes':
-	        manager.start(music_artist_survey.state_manager.get_first_state())
+        answer = manager.dialog_data.get(question_name)
+
+    if question_name == 'do_you_like_music' and answer == 'yes':
+        manager.start(music_artist_survey.state_manager.get_first_state())
 
 
 ```
@@ -255,7 +272,9 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram_dialog import DialogManager, setup_dialogs
 
 from aiogram_dialog_survey import Survey
-from aiogram_dialog_survey.interface import Question, QuestionType, Button
+from aiogram_dialog_survey.interface import Question
+from aiogram_dialog_survey.entities.question import QuestionType
+from aiogram_dialog_survey.entities.button import Button
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -302,15 +321,18 @@ survey = Survey(
     use_numbering=True
 )
 
+
 async def start_handler(message: types.Message, dialog_manager: DialogManager):
-	# метод get_first_state() можно использовать, если вы хотите запустить анкету не с помощью кнопки StartSurvey, как мы это делаем в существующем диалоге, а благодаря dialog_manager
+    # метод get_first_state() можно использовать, если вы хотите запустить анкету не с помощью кнопки StartSurvey, как мы это делаем в существующем диалоге, а благодаря dialog_manager
     await dialog_manager.start(survey.state_manager.get_first_state())
+
 
 async def survey_result_handler(result, dialog_manager: DialogManager):
     await dialog_manager.event.answer(
         "Спасибо за заполнение анкеты! Ваши ответы сохранены."
     )
     logging.info("Сохраняем результаты анкеты: %s", result)
+
 
 async def main():
     bot = Bot(token="YOUR_BOT_TOKEN")
@@ -323,7 +345,9 @@ async def main():
     setup_dialogs(dp)
     await dp.start_polling(bot)
 
+
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())
 ```

@@ -4,7 +4,6 @@ from typing import Optional, Tuple, Type, Union
 
 from aiogram import F
 from aiogram.fsm.state import State
-from aiogram.types import Message
 from aiogram_dialog.api.entities import Data, ShowMode, StartMode
 from aiogram_dialog.widgets.common import WhenCondition
 from aiogram_dialog.widgets.input import TextInput as AiogramTextInput
@@ -14,23 +13,23 @@ from aiogram_dialog.widgets.kbd import Multiselect as AiogramDialogMultiselect
 from aiogram_dialog.widgets.kbd import Select as AiogramDialogSelect
 from aiogram_dialog.widgets.kbd import Start as AiogramDialogStart
 from aiogram_dialog.widgets.kbd.button import OnClick
-from aiogram_dialog.widgets.kbd.state import EventProcessorButton, Cancel, Back
+from aiogram_dialog.widgets.kbd.state import Back, Cancel
 from aiogram_dialog.widgets.text import Const, Format, Text
 
+from aiogram_dialog_survey.entities.action_type import ActionType
+from aiogram_dialog_survey.entities.question import QuestionType
 from aiogram_dialog_survey.interface import (
-    AbstractValidator,
-    ActionType,
-    IWindowHandler,
     Question,
-    QuestionType, INavigationButtons,
 )
+from aiogram_dialog_survey.protocols.handler import HandlerProtocol
+from aiogram_dialog_survey.protocols.navigation_builder import NavigationBuilderProtocol
 
 WidgetButton = Tuple[str, Union[str, int]]
 
 
 class Widget(ABC):
     @abstractmethod
-    def __init__(self, question: Question, handler: IWindowHandler):
+    def __init__(self, question: Question, handler: HandlerProtocol):
         pass
 
     @abstractmethod
@@ -39,7 +38,7 @@ class Widget(ABC):
 
 
 class BaseWidget(Widget):
-    def __init__(self, question: Question, handler: IWindowHandler):
+    def __init__(self, question: Question, handler: HandlerProtocol):
         self.question = question
         self.handler = handler
 
@@ -117,7 +116,7 @@ class WidgetManager:
 
     @staticmethod
     def get_skip_button(
-        question: Question, handler: IWindowHandler
+        question: Question, handler: HandlerProtocol
     ) -> AiogramDialogButton | Const:
         if not question.is_required:
             return AiogramDialogButton(
@@ -156,23 +155,16 @@ class StartSurvey(AiogramDialogStart):
         )
 
 
-class Validator(AbstractValidator):
-    @staticmethod
-    async def on_error(message: Message, _, __, error: ValueError):
-        await message.answer(str(error))
-
-
-class NavigationButtons(INavigationButtons):
-
+class NavigationButtons(NavigationBuilderProtocol):
     @staticmethod
     def get_buttons(order: int) -> list[AiogramDialogButton]:
         buttons = []
-        
+
         if order == 0:
             pass
         else:
             buttons.append(Back(Const("Назад")))
-        
+
         buttons.append(Cancel(Const("Отменить заполнение")))
-        
+
         return buttons

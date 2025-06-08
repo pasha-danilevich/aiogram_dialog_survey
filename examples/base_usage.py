@@ -19,7 +19,7 @@ from aiogram_dialog.widgets.kbd import Next, SwitchTo
 from aiogram_dialog.widgets.text import Const
 
 from aiogram_dialog_survey import StartSurvey, Survey
-from examples import survey_static
+from examples import env, survey_static
 
 logging.getLogger('aiogram_dialog_survey').setLevel(logging.DEBUG)
 logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s')
@@ -80,7 +80,7 @@ async def main():
 
     setup_dialogs(dp)
 
-    await dp.start_polling(Bot(token='token'))
+    await dp.start_polling(Bot(token=env.TOKEN))
 
 
 if __name__ == "__main__":

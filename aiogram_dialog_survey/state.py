@@ -4,13 +4,12 @@ from typing import List, Type
 from aiogram.fsm.state import State, StatesGroup
 
 from aiogram_dialog_survey.interface import Question
-from examples.survey_static import survey
 
 
 class StateGroupFactory(StatesGroup):
     first_state_name = "start"
     last_state_name = "end"
-    
+
     @classmethod
     def create_state_group(
         cls, group_name: str, state_names: List[str]
@@ -22,12 +21,12 @@ class StateGroupFactory(StatesGroup):
         :param state_names: Список имен состояний.
         :return: Класс, унаследованный от StatesGroup.
         """
-        
+
         attrs = {name: State() for name in state_names}
-        
+
         # Создаем сам класс с помощью type()
         state_group = type(group_name, (StatesGroup,), attrs)
-        
+
         return state_group  # type: ignore
 
 
@@ -37,7 +36,7 @@ class StateManager(StateGroupFactory):
             name.title(),
             [question.name for question in questions],
         )
-    
+
     def get_first_state(self) -> State:
         state_attributes = {
             name: value
@@ -46,10 +45,9 @@ class StateManager(StateGroupFactory):
         }
         first_state_name = next(iter(state_attributes))
         return state_attributes[first_state_name]
-    
+
     def get_by_name(self, name: str) -> State:
         return getattr(self.state_group, name)
-    
+
     def get_by_index(self, index: int) -> State:
         return list(self.state_group)[index]
-    

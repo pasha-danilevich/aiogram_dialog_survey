@@ -4,11 +4,14 @@ from abc import ABC
 from functools import partial
 
 from aiogram.types import CallbackQuery, Message
-from aiogram_dialog import DialogManager, Data
+from aiogram_dialog import Data, DialogManager
 from aiogram_dialog.widgets.input import ManagedTextInput
 from aiogram_dialog.widgets.kbd import Button, Multiselect, Select
 
-from aiogram_dialog_survey.interface import ActionType, IWindowHandler, QuestionName, ISurvey, Question
+from aiogram_dialog_survey.entities.action_type import ActionType
+from aiogram_dialog_survey.entities.question import Question
+from aiogram_dialog_survey.protocols.handler import HandlerProtocol, QuestionName
+from aiogram_dialog_survey.protocols.survey import SurveyProtocol
 
 logger = logging.getLogger(__name__)
 
@@ -24,10 +27,10 @@ class Handlers:
     ):
         key = handler.get_widget_key()
         manager.dialog_data[key] = item_id
-        
+
         await handler.process_handler(manager, key, ActionType.ON_SELECT)
         await handler.next_or_done(manager)
-    
+
     @staticmethod
     async def skip(
         callback: CallbackQuery,
@@ -37,10 +40,10 @@ class Handlers:
     ):
         key = handler.get_widget_key()
         manager.dialog_data[key] = handler.SKIP_CONST
-        
+
         await handler.process_handler(manager, key, ActionType.ON_SKIP)
         await handler.next_or_done(manager)
-    
+
     @staticmethod
     async def input(
         message: Message,
@@ -51,10 +54,10 @@ class Handlers:
     ):
         key = handler.get_widget_key()
         manager.dialog_data[key] = text
-        
+
         await handler.process_handler(manager, key, ActionType.ON_INPUT_SUCCESS)
         await handler.next_or_done(manager)
-    
+
     @staticmethod
     async def multiselect(
         callback: CallbackQuery,
@@ -66,15 +69,15 @@ class Handlers:
         """Обработка множественного выбора"""
         key = handler.get_widget_key()
         selected = manager.dialog_data.setdefault(key, [])
-        
+
         if item_id in selected:
             selected.remove(item_id)
         else:
             selected.append(item_id)
-        
+
         manager.dialog_data[key] = selected
         await handler.process_handler(manager, key, ActionType.ON_MULTISELECT)
-    
+
     @staticmethod
     async def on_accept(
         callback: CallbackQuery,
@@ -83,22 +86,22 @@ class Handlers:
         handler: 'WindowHandler',
     ):
         key = handler.get_widget_key()
-        
+
         await handler.process_handler(manager, key, ActionType.ON_ACCEPT)
         await handler.next_or_done(manager)
 
 
-class WindowHandler(IWindowHandler, ABC):
+class WindowHandler(HandlerProtocol, ABC):
     SKIP_CONST = "__skipped__"
-    
-    def __init__(self, survey: ISurvey, question: Question):
+
+    def __init__(self, survey: SurveyProtocol, question: Question):
         self.survey = survey
         self.question = question
         self.question_name = question.name
-    
+
     def get_widget_key(self) -> QuestionName:
         return self.question_name
-    
+
     def get_handler(self, action_type: ActionType):
         match action_type:
             case ActionType.ON_SELECT:
@@ -112,10 +115,12 @@ class WindowHandler(IWindowHandler, ABC):
             case ActionType.ON_ACCEPT:
                 return partial(Handlers.on_accept, handler=self)
         raise ValueError("Unknown action type")
-    
+
     async def process_handler(
         self,
-        manager: DialogManager, question_name: QuestionName, action_type: ActionType
+        manager: DialogManager,
+        question_name: QuestionName,
+        action_type: ActionType,
     ) -> None:
         """Обрабатывает пользовательское действие в контексте текущего вопроса диалога.
 
@@ -133,17 +138,14 @@ class WindowHandler(IWindowHandler, ABC):
             question_name,
             manager.dialog_data.get(question_name, 'нет данных'),
         )
-    
-    async def process_survey_result(
-        self,
-        manager: DialogManager, result: Data
-    ) -> None:
+
+    async def process_survey_result(self, manager: DialogManager, result: Data) -> None:
         """Функция запускается в конце анкетирования, после последнего ответа"""
         logger.info(
             'Анкетирование завершилось. Собранные данные: %s',
             result,
         )
-    
+
     async def next_or_done(self, manager: DialogManager):
         try:
             await manager.next()

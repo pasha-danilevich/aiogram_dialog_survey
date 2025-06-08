@@ -12,21 +12,24 @@ from aiogram_dialog.widgets.kbd import (
 from aiogram_dialog.widgets.text import Const
 
 from aiogram_dialog_survey.handler import WindowHandler
-from aiogram_dialog_survey.interface import IWindowHandler, Question, ISurvey, INavigationButtons
+from aiogram_dialog_survey.interface import Question
+from aiogram_dialog_survey.protocols.handler import HandlerProtocol
+from aiogram_dialog_survey.protocols.navigation_builder import NavigationBuilderProtocol
+from aiogram_dialog_survey.protocols.survey import SurveyProtocol
 from aiogram_dialog_survey.state import StateManager
-from aiogram_dialog_survey.widgets import WidgetManager, NavigationButtons
+from aiogram_dialog_survey.widgets import NavigationButtons, WidgetManager
 
 
-class Survey(ISurvey):
+class Survey(SurveyProtocol):
     def __init__(
         self,
         name: str,
-        questions: list[Question], # FIXME: запретить передавать пустой список
+        questions: list[Question],  # FIXME: запретить передавать пустой список
         use_numbering: bool = True,
-        handler: Type[IWindowHandler] = WindowHandler,
+        handler: Type[HandlerProtocol] = WindowHandler,
         state_manager: Type[StateManager] = StateManager,
         widget_manager: Type[WidgetManager] = WidgetManager,
-        navigation_buttons: Type[INavigationButtons] = NavigationButtons,
+        navigation_buttons: Type[NavigationBuilderProtocol] = NavigationButtons,
     ):
         self.name = name
         self.use_numbering = use_numbering
@@ -36,7 +39,6 @@ class Survey(ISurvey):
         self.navigation_buttons = navigation_buttons
         self._handler = handler
         self._state_group = self.state_manager.state_group
-        
 
     def to_dialog(
         self,
