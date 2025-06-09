@@ -1,17 +1,18 @@
 from enum import StrEnum
-from typing import List, Optional
+from typing import Callable, List, Optional, TypeVar
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from aiogram_dialog_survey.entities.button import Button
-from aiogram_dialog_survey.protocols.validator import ValidatorProtocol
-from aiogram_dialog_survey.validator import StringValidator
+
+T = TypeVar('T')
+TypeFactory = Callable[[str], T]
 
 
 class QuestionType(StrEnum):
-    TEXT = "text"
-    SELECT = "select"
-    MULTISELECT = "multiselect"
+    TEXT_INPUT = "TextInput"
+    SELECT = "Select"
+    MULTISELECT = "Multiselect"
 
 
 class Question(BaseModel):
@@ -22,11 +23,11 @@ class Question(BaseModel):
     text: str
     is_required: bool
     buttons: Optional[List[Button]] = None
-    validator: Optional[ValidatorProtocol] = StringValidator()
+    validator: Optional[TypeFactory] = None
 
     @model_validator(mode='after')
     def validate_buttons_based_on_type(self) -> 'Question':
-        if self.question_type == QuestionType.TEXT:
+        if self.question_type == QuestionType.TEXT_INPUT:
             if self.buttons:
                 raise ValueError("Для TEXT-вопроса кнопки не допускаются")
         elif self.question_type in (QuestionType.SELECT, QuestionType.MULTISELECT):

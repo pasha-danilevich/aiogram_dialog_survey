@@ -1,9 +1,7 @@
 from typing import List
 
 from aiogram_dialog_survey.entities.button import Button
-from aiogram_dialog_survey.entities.question import QuestionType
-from aiogram_dialog_survey.interface import Question
-from aiogram_dialog_survey.validator import Validator
+from aiogram_dialog_survey.entities.question import Question, QuestionType
 
 
 def validate_int(text: str) -> int:
@@ -31,10 +29,10 @@ survey: List[Question] = [
     ),
     Question(
         name="years_experience",
-        question_type=QuestionType.TEXT,
+        question_type=QuestionType.TEXT_INPUT,
         text="Сколько лет вы занимаетесь программированием?",
         is_required=True,
-        validator=Validator(validate_int),
+        validator=validate_int,
     ),
     Question(
         name="preferred_tools",

@@ -32,7 +32,7 @@ from aiogram_dialog_survey.entities.button import Button
 questions = [
     Question(
         name="name",
-        question_type=QuestionType.TEXT,
+        question_type=QuestionType.TEXT_INPUT,
         text="Как вас зовут?",
         is_required=True
     ),
@@ -85,7 +85,7 @@ from aiogram_dialog_survey.entities.button import Button
 questions = [
     Question(
         name="username",  # уникальный идентификатор вопроса
-        question_type=QuestionType.TEXT,  # тип вопроса
+        question_type=QuestionType.TEXT_INPUT,  # тип вопроса
         text="Введите ваше имя:",  # текст вопроса
         is_required=True  # обязательный ли вопрос
     ),
@@ -105,7 +105,7 @@ questions = [
     #
     Question(
         name="height",
-        question_type=QuestionType.TEXT,
+        question_type=QuestionType.TEXT_INPUT,
         text="Введите ваш рост:",
         is_required=True
     ),
@@ -283,7 +283,7 @@ logging.basicConfig(level=logging.INFO)
 questions = [
     Question(
         name="name",
-        question_type=QuestionType.TEXT,
+        question_type=QuestionType.TEXT_INPUT,
         text="Как вас зовут?",
         is_required=True
     ),

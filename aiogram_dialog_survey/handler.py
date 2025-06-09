@@ -91,7 +91,7 @@ class Handlers:
         await handler.next_or_done(manager)
 
 
-class WindowHandler(HandlerProtocol, ABC):
+class WindowHandler(HandlerProtocol, ABC):  # зачем от ABC наследован
     SKIP_CONST = "__skipped__"
 
     def __init__(self, survey: SurveyProtocol, question: Question):
@@ -152,3 +152,28 @@ class WindowHandler(HandlerProtocol, ABC):
         except IndexError:
             result_data = manager.dialog_data
             await self.process_survey_result(manager, result_data)
+
+
+class FakeHandler(HandlerProtocol):
+    def __init__(self, survey: SurveyProtocol = None, question: Question = None):
+        pass
+
+    def get_widget_key(self) -> str:
+        pass
+
+    def get_handler(self, handler_type: ActionType):
+        pass
+
+    @staticmethod
+    async def process_handler(
+        manager: DialogManager, widget_key: QuestionName, action_type: ActionType
+    ) -> None:
+        pass
+
+    @staticmethod
+    async def process_survey_result(manager: DialogManager, result: Data) -> None:
+        pass
+
+    @staticmethod
+    async def next_or_done(manager: DialogManager):
+        pass

@@ -5,12 +5,13 @@ from aiogram_dialog import Data, DialogManager
 
 from aiogram_dialog_survey.entities.action_type import ActionType
 from aiogram_dialog_survey.entities.question import Question
-from aiogram_dialog_survey.protocols.survey import SurveyProtocol
+
+QuestionName: TypeAlias = str
 
 
 class HandlerProtocol(Protocol):
     @abstractmethod
-    def __init__(self, survey: SurveyProtocol, question: Question):
+    def __init__(self, survey: 'SurveyProtocol', question: Question):
         raise NotImplementedError
 
     @abstractmethod
@@ -38,6 +39,3 @@ class HandlerProtocol(Protocol):
     @abstractmethod
     async def next_or_done(manager: DialogManager):
         raise NotImplementedError
-
-
-QuestionName: TypeAlias = str

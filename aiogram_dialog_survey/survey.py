@@ -11,34 +11,34 @@ from aiogram_dialog.widgets.kbd import (
 )
 from aiogram_dialog.widgets.text import Const
 
+from aiogram_dialog_survey.entities.question import Question
 from aiogram_dialog_survey.handler import WindowHandler
-from aiogram_dialog_survey.interface import Question
 from aiogram_dialog_survey.protocols.handler import HandlerProtocol
-from aiogram_dialog_survey.protocols.navigation_builder import NavigationBuilderProtocol
+from aiogram_dialog_survey.protocols.state_manager import StateManagerProtocol
 from aiogram_dialog_survey.protocols.survey import SurveyProtocol
 from aiogram_dialog_survey.state import StateManager
-from aiogram_dialog_survey.widgets import NavigationButtons, WidgetManager
+from aiogram_dialog_survey.widget_factory import WidgetFactory
 
 
 class Survey(SurveyProtocol):
     def __init__(
         self,
         name: str,
-        questions: list[Question],  # FIXME: запретить передавать пустой список
+        questions: list[Question],
         use_numbering: bool = True,
         handler: Type[HandlerProtocol] = WindowHandler,
-        state_manager: Type[StateManager] = StateManager,
-        widget_manager: Type[WidgetManager] = WidgetManager,
-        navigation_buttons: Type[NavigationBuilderProtocol] = NavigationButtons,
+        state_manager: Type[StateManagerProtocol] = StateManager,
+        widget_factory: Type[WidgetFactory] = WidgetFactory,
     ):
+        if len(questions) == 0:
+            raise ValueError("Список вопросов не может быть пустым")
+
         self.name = name
         self.use_numbering = use_numbering
         self.questions = questions
         self.state_manager = state_manager(name=name, questions=questions)
-        self.widget_manager = widget_manager
-        self.navigation_buttons = navigation_buttons
+        self._widget_factory = widget_factory
         self._handler = handler
-        self._state_group = self.state_manager.state_group
 
     def to_dialog(
         self,
@@ -54,11 +54,11 @@ class Survey(SurveyProtocol):
         )
 
     @staticmethod
-    def _get_static_buttons(order: int) -> list[Button]:
+    def _render_navigation_buttons(order: int) -> list[Button]:
         buttons = []
 
         if order == 0:
-            buttons.append(Cancel(Const("Назад")))
+            pass
         else:
             buttons.append(Back(Const("Назад")))
 
@@ -68,30 +68,31 @@ class Survey(SurveyProtocol):
 
     def _create_windows(self) -> List[Window]:
         windows = list()
-        questionnaire_length = len(self.questions)
+        questions_count = len(self.questions)
 
         for order, question in enumerate(self.questions):
             handler = self._handler(survey=self, question=question)
             sequence_question_label = (
-                Const(f"Вопрос {order + 1}/{questionnaire_length}")
+                Const(f"Вопрос {order + 1}/{questions_count}")
                 if self.use_numbering
                 else Const("")
             )
-            widget = self.widget_manager.get_widget(question.question_type)
-            navigation_buttons = self.navigation_buttons.get_buttons(order)
+            widget = self._widget_factory(question.question_type).render(
+                question, handler
+            )
 
             window = Window(
                 sequence_question_label,
                 Const(f"{question.text}"),
-                widget(question, handler).create(),
+                widget,
                 Group(
                     *[
-                        *navigation_buttons,
-                        self.widget_manager.get_skip_button(question, handler),
+                        *self._render_navigation_buttons(order),
+                        self._widget_factory("SkipButton").render(question, handler),
                     ],
                     width=2,
                 ),
-                state=getattr(self._state_group, question.name),
+                state=self.state_manager.get_by_name(question.name),
             )
 
             windows.append(window)
