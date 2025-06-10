@@ -1,3 +1,4 @@
+# widgets.py
 from typing import Tuple, Union
 
 from aiogram import F
@@ -12,12 +13,10 @@ from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog_survey.entities.action_type import ActionType
 from aiogram_dialog_survey.entities.question import Question
 from aiogram_dialog_survey.protocols.handler import HandlerProtocol
-from aiogram_dialog_survey.widget_factory import WidgetFactory
+from aiogram_dialog_survey.protocols.widget import WidgetProtocol
 
 
-class TextInput(WidgetFactory):
-    name = 'TextInput'
-
+class TextInput(WidgetProtocol):
     def render(self, question: Question, handler: HandlerProtocol):
         return AiogramTextInput(
             id=f'input_{question.name.strip()}',
@@ -31,8 +30,7 @@ class TextInput(WidgetFactory):
         await message.answer(str(error))
 
 
-class Select(WidgetFactory):
-    name = 'Select'
+class Select(WidgetProtocol):
     WidgetButton = Tuple[str, Union[str, int]]
 
     def render(self, question: Question, handler: HandlerProtocol):
@@ -58,7 +56,6 @@ class Select(WidgetFactory):
 
 
 class Multiselect(Select):
-    name = "Multiselect"
     ACCEPT_BUTTON_TEXT = "Подтвердить выбор"
 
     def render(self, question: Question, handler: HandlerProtocol):
@@ -81,8 +78,7 @@ class Multiselect(Select):
         )
 
 
-class SkipButton(WidgetFactory):
-    name = 'SkipButton'
+class SkipButton(WidgetProtocol):
     BUTTON_TEXT = "Пропустить вопрос"
 
     def render(self, question: Question, handler: HandlerProtocol):
@@ -91,3 +87,15 @@ class SkipButton(WidgetFactory):
             id=f'skip_{question.name.strip()}',
             on_click=handler.get_handler(ActionType.ON_SKIP),
         )
+
+
+if __name__ == '__main__':
+    from aiogram_dialog_survey.handler import FakeHandler
+    from examples.survey_static import survey
+
+    # Usage
+    for q in survey:
+        handler_ = FakeHandler()
+        # widget = WidgetFactory.create(q.widget_type)
+        # result = widget.render(q, FakeHandler())
+        # print(result)

@@ -25,20 +25,20 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram_dialog import DialogManager, setup_dialogs
 
 from aiogram_dialog_survey import Survey, StartSurvey
-from aiogram_dialog_survey.entities.question import QuestionType, Question
+from aiogram_dialog_survey.entities.question import WidgetType, Question
 from aiogram_dialog_survey.entities.button import Button
 
 # Определяем вопросы анкеты
 questions = [
     Question(
         name="name",
-        question_type=QuestionType.TEXT_INPUT,
+        widget_type=WidgetType.TEXT_INPUT,
         text="Как вас зовут?",
         is_required=True
     ),
     Question(
         name="age",
-        question_type=QuestionType.SELECT,
+        widget_type=WidgetType.SELECT,
         text="Сколько вам лет?",
         is_required=True,
         buttons=[
@@ -78,20 +78,20 @@ async def main():
 
 ```python
 from aiogram_dialog_survey.interface import Question
-from aiogram_dialog_survey.entities.question import QuestionType
+from aiogram_dialog_survey.entities.question import WidgetType
 from aiogram_dialog_survey.entities.button import Button
 
 # Вопросы, их типы и варианты ответов можно хранить в БД или в любом другом удобном месте, чтобы не засорять кодовую базу проекта и сосредоточится на более важных аспектах
 questions = [
     Question(
         name="username",  # уникальный идентификатор вопроса
-        question_type=QuestionType.TEXT_INPUT,  # тип вопроса
+        question_type=WidgetType.TEXT_INPUT,  # тип вопроса
         text="Введите ваше имя:",  # текст вопроса
         is_required=True  # обязательный ли вопрос
     ),
     Question(
         name="hobbies",
-        question_type=QuestionType.MULTISELECT,
+        question_type=WidgetType.MULTISELECT,
         text="Выберите ваши увлечения:",
         is_required=False,
         buttons=[
@@ -105,7 +105,7 @@ questions = [
     #
     Question(
         name="height",
-        question_type=QuestionType.TEXT_INPUT,
+        question_type=WidgetType.TEXT_INPUT,
         text="Введите ваш рост:",
         is_required=True
     ),
@@ -273,7 +273,7 @@ from aiogram_dialog import DialogManager, setup_dialogs
 
 from aiogram_dialog_survey import Survey
 from aiogram_dialog_survey.interface import Question
-from aiogram_dialog_survey.entities.question import QuestionType
+from aiogram_dialog_survey.entities.question import WidgetType
 from aiogram_dialog_survey.entities.button import Button
 
 # Настройка логирования
@@ -283,13 +283,13 @@ logging.basicConfig(level=logging.INFO)
 questions = [
     Question(
         name="name",
-        question_type=QuestionType.TEXT_INPUT,
+        question_type=WidgetType.TEXT_INPUT,
         text="Как вас зовут?",
         is_required=True
     ),
     Question(
         name="age_group",
-        question_type=QuestionType.SELECT,
+        question_type=WidgetType.SELECT,
         text="Ваша возрастная группа?",
         is_required=True,
         buttons=[
@@ -302,7 +302,7 @@ questions = [
     ),
     Question(
         name="interests",
-        question_type=QuestionType.MULTISELECT,
+        question_type=WidgetType.MULTISELECT,
         text="Какие темы вам интересны? (можно выбрать несколько)",
         is_required=False,
         buttons=[

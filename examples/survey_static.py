@@ -1,7 +1,7 @@
 from typing import List
 
 from aiogram_dialog_survey.entities.button import Button
-from aiogram_dialog_survey.entities.question import Question, QuestionType
+from aiogram_dialog_survey.entities.question import Question, WidgetType
 
 
 def validate_int(text: str) -> int:
@@ -17,7 +17,7 @@ def validate_int(text: str) -> int:
 survey: List[Question] = [
     Question(
         name="favorite_language",
-        question_type=QuestionType.SELECT,
+        widget_type=WidgetType.SELECT,
         text="Какой ваш любимый язык программирования?",
         is_required=True,
         buttons=[
@@ -29,14 +29,14 @@ survey: List[Question] = [
     ),
     Question(
         name="years_experience",
-        question_type=QuestionType.TEXT_INPUT,
+        widget_type=WidgetType.TEXT_INPUT,
         text="Сколько лет вы занимаетесь программированием?",
         is_required=True,
         validator=validate_int,
     ),
     Question(
         name="preferred_tools",
-        question_type=QuestionType.MULTISELECT,
+        widget_type=WidgetType.MULTISELECT,
         text="Какие инструменты разработки вы используете?",
         is_required=False,
         buttons=[
@@ -49,7 +49,7 @@ survey: List[Question] = [
     ),
     Question(
         name="interested_topics",
-        question_type=QuestionType.MULTISELECT,
+        widget_type=WidgetType.MULTISELECT,
         text="Какие темы в IT вам наиболее интересны?",
         is_required=True,
         buttons=[

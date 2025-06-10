@@ -16,6 +16,8 @@ from aiogram_dialog_survey.handler import WindowHandler
 from aiogram_dialog_survey.protocols.handler import HandlerProtocol
 from aiogram_dialog_survey.protocols.state_manager import StateManagerProtocol
 from aiogram_dialog_survey.protocols.survey import SurveyProtocol
+from aiogram_dialog_survey.protocols.widget import WidgetProtocol
+from aiogram_dialog_survey.protocols.widget_factory import WidgetFactoryProtocol
 from aiogram_dialog_survey.state import StateManager
 from aiogram_dialog_survey.widget_factory import WidgetFactory
 
@@ -28,7 +30,7 @@ class Survey(SurveyProtocol):
         use_numbering: bool = True,
         handler: Type[HandlerProtocol] = WindowHandler,
         state_manager: Type[StateManagerProtocol] = StateManager,
-        widget_factory: Type[WidgetFactory] = WidgetFactory,
+        widget_factory: Type[WidgetFactoryProtocol] = WidgetFactory,
     ):
         if len(questions) == 0:
             raise ValueError("Список вопросов не может быть пустым")
@@ -52,6 +54,9 @@ class Survey(SurveyProtocol):
             on_close=on_close,
             on_process_result=on_process_result,
         )
+
+    def register_widget(self, widget_cls: Type[WidgetProtocol]):
+        self._widget_factory.register(widget_cls)
 
     @staticmethod
     def _render_navigation_buttons(order: int) -> list[Button]:
@@ -77,18 +82,17 @@ class Survey(SurveyProtocol):
                 if self.use_numbering
                 else Const("")
             )
-            widget = self._widget_factory(question.question_type).render(
-                question, handler
-            )
+            widget = self._widget_factory.create(question.widget_type)
+            skip_button = self._widget_factory.create("SkipButton")
 
             window = Window(
                 sequence_question_label,
                 Const(f"{question.text}"),
-                widget,
+                widget.render(question, handler),
                 Group(
                     *[
                         *self._render_navigation_buttons(order),
-                        self._widget_factory("SkipButton").render(question, handler),
+                        skip_button.render(question, handler),
                     ],
                     width=2,
                 ),

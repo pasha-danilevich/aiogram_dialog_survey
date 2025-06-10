@@ -9,7 +9,7 @@ T = TypeVar('T')
 TypeFactory = Callable[[str], T]
 
 
-class QuestionType(StrEnum):
+class WidgetType(StrEnum):
     TEXT_INPUT = "TextInput"
     SELECT = "Select"
     MULTISELECT = "Multiselect"
@@ -19,7 +19,7 @@ class Question(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     name: str
-    question_type: QuestionType
+    widget_type: WidgetType
     text: str
     is_required: bool
     buttons: Optional[List[Button]] = None
@@ -27,17 +27,17 @@ class Question(BaseModel):
 
     @model_validator(mode='after')
     def validate_buttons_based_on_type(self) -> 'Question':
-        if self.question_type == QuestionType.TEXT_INPUT:
+        if self.widget_type == WidgetType.TEXT_INPUT:
             if self.buttons:
                 raise ValueError("Для TEXT-вопроса кнопки не допускаются")
-        elif self.question_type in (QuestionType.SELECT, QuestionType.MULTISELECT):
+        elif self.widget_type in (WidgetType.SELECT, WidgetType.MULTISELECT):
             if not self.buttons or len(self.buttons) == 0:
                 raise ValueError(
-                    f"Для {self.question_type.value.upper()}-вопроса обязательны кнопки"
+                    f"Для {self.widget_type.value.upper()}-вопроса обязательны кнопки"
                 )
             if len(self.buttons) < 2:
                 raise ValueError(
-                    f"Для {self.question_type.value.upper()}-вопроса нужно минимум 2"
+                    f"Для {self.widget_type.value.upper()}-вопроса нужно минимум 2"
                     " кнопки"
                 )
         return self
