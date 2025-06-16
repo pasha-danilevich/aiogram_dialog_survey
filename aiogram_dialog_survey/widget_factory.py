@@ -22,7 +22,6 @@ class WidgetFactory(WidgetFactoryProtocol):
     @classmethod
     def create(cls, name: str) -> WidgetProtocol:
         """Фабричный метод для создания виджетов."""
-        print(cls._registry)
         if name not in cls._registry:
             raise ValueError(f'Unknown widget type: {name}')
         return object.__new__(cls._registry[name])

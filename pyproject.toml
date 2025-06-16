@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiogram-dialog-survey"
-version = "0.2.7"
+version = "0.2.0"
 description = "Quick and easy creation of surveys, questionnaires, and forms using aiogram-dialog"
 authors = ["Pavel Danilevich <danilevitch.pasha@yandex.ru>"]
 
