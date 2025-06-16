@@ -55,7 +55,7 @@ class Survey(SurveyProtocol):
             on_process_result=on_process_result,
         )
 
-    def register_widget(self, widget_cls: Type[WidgetProtocol]):
+    def register_widget(self, widget_cls: WidgetProtocol):
         self._widget_factory.register(widget_cls)
 
     @staticmethod

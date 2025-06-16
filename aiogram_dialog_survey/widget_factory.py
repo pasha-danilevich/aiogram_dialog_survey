@@ -2,10 +2,11 @@
 from typing import Dict, Type
 
 from aiogram_dialog_survey.protocols.widget import WidgetProtocol
+from aiogram_dialog_survey.protocols.widget_factory import WidgetFactoryProtocol
 from aiogram_dialog_survey.widgets import Multiselect, Select, TextInput
 
 
-class WidgetFactory:
+class WidgetFactory(WidgetFactoryProtocol):
     _registry: Dict[str, Type[WidgetProtocol]] = {
         'TextInput': TextInput,
         'Select': Select,
