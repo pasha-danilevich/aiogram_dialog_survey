@@ -6,6 +6,7 @@ from aiogram_dialog.dialog import OnDialogEvent, OnResultEvent
 
 from aiogram_dialog_survey.entities.question import Question
 from aiogram_dialog_survey.protocols.handler import HandlerProtocol
+from aiogram_dialog_survey.protocols.navigation_button import NavigationButtonProtocol
 from aiogram_dialog_survey.protocols.state_manager import StateManagerProtocol
 from aiogram_dialog_survey.widget_factory import WidgetFactory
 
@@ -23,6 +24,7 @@ class SurveyProtocol(Protocol):
         questions: list[Question],
         use_numbering: bool,
         handler: Type['HandlerProtocol'],
+        navigation_button: Type[NavigationButtonProtocol],
         state_manager: Type[StateManagerProtocol],
         widget_factory: Type[WidgetFactory],
     ): ...

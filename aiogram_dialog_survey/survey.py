@@ -13,7 +13,9 @@ from aiogram_dialog.widgets.text import Const
 
 from aiogram_dialog_survey.entities.question import Question
 from aiogram_dialog_survey.handler import WindowHandler
+from aiogram_dialog_survey.navigation_button import NavigationButton
 from aiogram_dialog_survey.protocols.handler import HandlerProtocol
+from aiogram_dialog_survey.protocols.navigation_button import NavigationButtonProtocol
 from aiogram_dialog_survey.protocols.state_manager import StateManagerProtocol
 from aiogram_dialog_survey.protocols.survey import SurveyProtocol
 from aiogram_dialog_survey.protocols.widget import WidgetProtocol
@@ -29,6 +31,7 @@ class Survey(SurveyProtocol):
         questions: list[Question],
         use_numbering: bool = True,
         handler: Type[HandlerProtocol] = WindowHandler,
+        navigation_button: Type[NavigationButtonProtocol] = NavigationButton,
         state_manager: Type[StateManagerProtocol] = StateManager,
         widget_factory: Type[WidgetFactoryProtocol] = WidgetFactory,
     ):
@@ -39,6 +42,7 @@ class Survey(SurveyProtocol):
         self.use_numbering = use_numbering
         self.questions = questions
         self.state_manager = state_manager(name=name, questions=questions)
+        self._navigation_button = navigation_button()
         self._widget_factory = widget_factory
         self._handler = handler
 
@@ -57,19 +61,6 @@ class Survey(SurveyProtocol):
 
     def register_widget(self, widget_cls: WidgetProtocol):
         self._widget_factory.register(widget_cls)
-
-    @staticmethod
-    def _render_navigation_buttons(order: int) -> list[Button]:
-        buttons = []
-
-        if order == 0:
-            pass
-        else:
-            buttons.append(Back(Const("Назад")))
-
-        buttons.append(Cancel(Const("Отменить заполнение")))
-
-        return buttons
 
     def _create_windows(self) -> List[Window]:
         windows = list()
@@ -91,7 +82,7 @@ class Survey(SurveyProtocol):
                 widget.render(question, handler),
                 Group(
                     *[
-                        *self._render_navigation_buttons(order),
+                        *self._navigation_button.render(order=order),
                         skip_button.render(question, handler),
                     ],
                     width=2,
