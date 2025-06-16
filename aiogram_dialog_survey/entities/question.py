@@ -21,9 +21,9 @@ class Question(BaseModel):
     name: str
     widget_type: WidgetType
     text: str
-    is_required: bool
+    is_required: bool = True
     buttons: Optional[List[Button]] = None
-    validator: Optional[TypeFactory] = None
+    validator: Optional[TypeFactory] = str
 
     @model_validator(mode='after')
     def validate_buttons_based_on_type(self) -> 'Question':

@@ -19,7 +19,6 @@ survey: List[Question] = [
         name="favorite_language",
         widget_type=WidgetType.SELECT,
         text="Какой ваш любимый язык программирования?",
-        is_required=True,
         buttons=[
             Button(text="Python", callback="python"),
             Button(text="JavaScript", callback="js"),
@@ -31,8 +30,13 @@ survey: List[Question] = [
         name="years_experience",
         widget_type=WidgetType.TEXT_INPUT,
         text="Сколько лет вы занимаетесь программированием?",
-        is_required=True,
         validator=validate_int,
+    ),
+    Question(
+        name="years",
+        widget_type=WidgetType.TEXT_INPUT,
+        text="Сколько Вам лет?",
+        is_required=False,
     ),
     Question(
         name="preferred_tools",
