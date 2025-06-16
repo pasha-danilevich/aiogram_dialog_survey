@@ -3,7 +3,7 @@ from typing import Dict, Type
 
 from aiogram_dialog_survey.protocols.widget import WidgetProtocol
 from aiogram_dialog_survey.protocols.widget_factory import WidgetFactoryProtocol
-from aiogram_dialog_survey.widgets import Multiselect, Select, TextInput
+from aiogram_dialog_survey.widgets import Multiselect, Select, TextInput, SkipButton
 
 
 class WidgetFactory(WidgetFactoryProtocol):
@@ -11,7 +11,7 @@ class WidgetFactory(WidgetFactoryProtocol):
         'TextInput': TextInput,
         'Select': Select,
         'Multiselect': Multiselect,
-        # 'SkipButton': SkipButton,
+        'SkipButton': SkipButton,
     }
 
     @classmethod

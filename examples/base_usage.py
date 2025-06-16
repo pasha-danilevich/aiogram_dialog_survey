@@ -19,7 +19,6 @@ from aiogram_dialog.widgets.kbd import Next, SwitchTo
 from aiogram_dialog.widgets.text import Const
 
 from aiogram_dialog_survey import StartSurvey, Survey
-from aiogram_dialog_survey.widgets import SkipButton
 from examples import env, survey_static
 
 logging.getLogger('aiogram_dialog_survey').setLevel(logging.DEBUG)
@@ -27,7 +26,6 @@ logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s')
 
 
 survey = Survey(name='survey', questions=survey_static.survey)
-survey.register_widget(SkipButton)
 survey_dialog = survey.to_dialog()
 
 
