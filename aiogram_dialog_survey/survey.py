@@ -83,7 +83,7 @@ class Survey(SurveyProtocol):
                 Group(
                     *[
                         *self._navigation_button.render(order=order),
-                        skip_button.render(question, handler),
+                        skip_button.render(question, handler) if not question.is_required else Button(Const(''), id='none'),
                     ],
                     width=2,
                 ),
